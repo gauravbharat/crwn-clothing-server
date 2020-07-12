@@ -1,10 +1,13 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
+import { createStructuredSelector } from 'reselect';
 
 import { auth } from '../../firebase/firebase.utils';
 import CartIcon from '../cart-icon/cart-icon.component';
 import CartDropDown from '../cart-dropdown/cart-dropdown.component';
+import { currentUserSelector } from '../../redux/user/user.selectors';
+import { cartHiddenSelector } from '../../redux/cart/cart.selectors';
 
 import { ReactComponent as Logo } from '../../assets/crown.svg';
 
@@ -40,9 +43,10 @@ const Header = ({ currentUser, hidden }) => {
 };
 
 // where argument 'state' === top-level root reducer
-const mapStateToProps = ({ user: { currentUser }, cart: { hidden } }) => ({
-  currentUser,
-  hidden
+// Instead of passing each method the state props, createStructuredSelector would pass it to them
+const mapStateToProps = createStructuredSelector({
+  currentUser: currentUserSelector,
+  hidden: cartHiddenSelector
 });
 
 export default connect(mapStateToProps)(Header);

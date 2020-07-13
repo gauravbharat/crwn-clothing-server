@@ -8,6 +8,7 @@ import './App.css';
 import HomePage from './pages/homepage/homepage.component';
 import ShopPage from './pages/shop/shop.component';
 import Authentication from './pages/authentication/authentication.component';
+import CheckoutPage from './pages/checkout/checkout.component';
 import Header from './components/header/header.component';
 import NoMatch from './pages/no-match/no-match.component';
 import { setCurrentUser } from './redux/user/user.actions';
@@ -62,9 +63,12 @@ class App extends React.Component {
         <Header />
         <Switch>
           <Route exact path='/' component={HomePage} />
+          {/* Shop page would have sub-routes under it e.g. shop/jackets, etc., hence exact keyword not used for path */}
           <Route path='/shop' component={ShopPage} />
+          <Route exact path='/checkout' component={CheckoutPage} />
           {/* Use conditional render, if user is signed-in Redirect to Homepage OR to sign-in page if user is logged-out */}
           <Route
+            exact
             path='/signin'
             render={() =>
               this.props.currentUser ? <Redirect to='/' /> : <Authentication />

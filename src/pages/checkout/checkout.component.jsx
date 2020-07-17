@@ -10,44 +10,52 @@ import {
   cartTotalSelector
 } from '../../redux/cart/cart.selectors';
 
-import './checkout.styles.scss';
+import {
+  CheckoutPageContainer,
+  CheckoutHeaderContainer,
+  HeaderBlockContainer,
+  HeaderBlock,
+  TotalContainer,
+  Total,
+  TestWarningContainer
+} from './checkout.styles';
 
 const CheckoutPage = ({ cartItems, total }) => {
   return (
-    <div className='checkout-page'>
-      <div className='checkout-header'>
-        <div className='header-block'>
-          <span>Product</span>
-        </div>
-        <div className='header-block'>
-          <span>Description</span>
-        </div>
-        <div className='header-block'>
-          <span>Quantity</span>
-        </div>
-        <div className='header-block'>
-          <span>Price</span>
-        </div>
-        <div className='header-block'>
-          <span>Remove</span>
-        </div>
-      </div>
+    <CheckoutPageContainer>
+      <CheckoutHeaderContainer>
+        <HeaderBlockContainer>
+          <HeaderBlock>Product</HeaderBlock>
+        </HeaderBlockContainer>
+        <HeaderBlockContainer>
+          <HeaderBlock>Description</HeaderBlock>
+        </HeaderBlockContainer>
+        <HeaderBlockContainer>
+          <HeaderBlock>Quantity</HeaderBlock>
+        </HeaderBlockContainer>
+        <HeaderBlockContainer>
+          <HeaderBlock>Price</HeaderBlock>
+        </HeaderBlockContainer>
+        <HeaderBlockContainer>
+          <HeaderBlock>Remove</HeaderBlock>
+        </HeaderBlockContainer>
+      </CheckoutHeaderContainer>
       {cartItems.map(cartItem => (
         <CheckoutItem key={cartItem.id} cartItem={cartItem} />
       ))}
 
-      <div className='total'>
-        <span>TOTAL: ${total}</span>
-      </div>
+      <TotalContainer className='total'>
+        <Total>TOTAL: ${total}</Total>
+      </TotalContainer>
 
-      <div className='test-warning'>
+      <TestWarningContainer className='test-warning'>
         *Please use the following test credit card for payments*
         <br />
         5555 5555 5555 4444 - Exp: 01/23 - CVV: 007
-      </div>
+      </TestWarningContainer>
 
       <StripeCheckoutButton price={total} />
-    </div>
+    </CheckoutPageContainer>
   );
 };
 

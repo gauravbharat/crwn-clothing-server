@@ -39,6 +39,14 @@ export const ImageContainer = styled.div`
   } */
 `;
 
+const getExtendedStyles = ({ extendedProps }) => {
+  if (extendedProps) {
+    return extendedProps;
+  }
+
+  return '';
+};
+
 export const CollectionItemContainer = styled.div`
   width: 22vw;
   display: flex;
@@ -55,4 +63,6 @@ export const CollectionItemContainer = styled.div`
       display: flex;
     }
   }
+
+  ${getExtendedStyles}
 `;

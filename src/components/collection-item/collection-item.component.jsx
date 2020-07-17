@@ -11,11 +11,11 @@ import {
   AddButton
 } from './collection-item.styles';
 
-const CollectionItem = ({ item, addCartItem }) => {
+const CollectionItem = ({ item, addCartItem, ...otherProps }) => {
   const { name, price, imageUrl } = item;
 
   return (
-    <CollectionItemContainer>
+    <CollectionItemContainer extendedProps={otherProps.extendedProps}>
       <ImageContainer imageUrl={imageUrl} />
       <CollectionFooterContainer>
         <NameContainer>{name}</NameContainer>

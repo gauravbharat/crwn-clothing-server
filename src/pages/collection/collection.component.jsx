@@ -1,10 +1,15 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Redirect } from 'react-router-dom';
-import './collection.styles.scss';
 
-import CollectionItem from '../../components/collection-item/collection-item.component';
 import { collectionSelector } from '../../redux/shop/shop.selectors';
+import CollectionItem from '../../components/collection-item/collection-item.component';
+
+import {
+  CollectionPageContainer,
+  TitleHeading,
+  ItemsContainer
+} from './collection.styles';
 
 const CollectionPage = ({ collection, collectionId }) => {
   if (!collection) {
@@ -14,14 +19,19 @@ const CollectionPage = ({ collection, collectionId }) => {
 
   const { title, items } = collection;
   return (
-    <div className='collection-page'>
-      <h2 className='title'>{title}</h2>
-      <div className='items'>
+    <CollectionPageContainer>
+      <TitleHeading>{title}</TitleHeading>
+      {/* Setting property on CollectionItem did not work in this context, so passed the desired CSS property and its value as a prop and handled it in collection-item component and its style */}
+      <ItemsContainer>
         {items.map(item => (
-          <CollectionItem key={item.id} item={item} />
+          <CollectionItem
+            key={item.id}
+            item={item}
+            extendedProps={'margin-bottom: 30px;'}
+          />
         ))}
-      </div>
-    </div>
+      </ItemsContainer>
+    </CollectionPageContainer>
   );
 };
 

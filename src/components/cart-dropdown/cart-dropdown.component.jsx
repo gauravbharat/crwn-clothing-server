@@ -8,20 +8,24 @@ import CartItem from '../cart-item/cart-item.component';
 import { cartItemsSelector } from '../../redux/cart/cart.selectors';
 import { toggleCartHidden } from '../../redux/cart/cart.actions';
 
-import './cart-dropdown.styles.scss';
+import {
+  CartDropDownContainer,
+  CartItemsContainer,
+  MessageContainer
+} from './cart-dropdown.styles';
 
 const CartDropDown = ({ cartItems, history, dispatch }) => {
   return (
-    <div className='cart-dropdown'>
-      <div className='cart-items'>
+    <CartDropDownContainer>
+      <CartItemsContainer>
         {cartItems.length ? (
           cartItems.map(cartItem => (
             <CartItem key={cartItem.id} item={cartItem} />
           ))
         ) : (
-          <span className='empty-message'>Your cart is empty</span>
+          <MessageContainer>Your cart is empty</MessageContainer>
         )}
-      </div>
+      </CartItemsContainer>
       <CustomButton
         onClick={() => {
           history.push('/checkout');
@@ -30,7 +34,7 @@ const CartDropDown = ({ cartItems, history, dispatch }) => {
       >
         GO TO CHECKOUT
       </CustomButton>
-    </div>
+    </CartDropDownContainer>
   );
 };
 

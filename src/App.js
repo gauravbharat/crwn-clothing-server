@@ -13,42 +13,46 @@ import Header from './components/header/header.component';
 import NoMatch from './pages/no-match/no-match.component';
 import { setCurrentUser } from './redux/user/user.actions';
 import { currentUserSelector } from './redux/user/user.selectors';
+import { collectionsForPreviewSelector } from './redux/shop/shop.selectors';
 
-import { auth, createUserProfileDocument } from './firebase/firebase.utils';
+import {
+  auth,
+  createUserProfileDocument,
+  addCollectionAndDocuments
+} from './firebase/firebase.utils';
 
 class App extends React.Component {
   unsubscribeFromAuth = null;
 
-  resetUserState = () => this.props.setCurrentUser(null);
-
   componentDidMount() {
-    // onAuthStateChanged is a open subscription (open message system) between the app and firebase
-    // that is, whenever any changes occur on firebase, firebase sends out a message that user has updated
-    // This will automatically check for user login status
-    // since this is an open subscription, we also want to close the subscription since we don't want any memory leaks from JavaScript
-    // onAuthStateChanged returns a function inside the unsubscribeFromAuth property, which when called when component unmounts
-    // would closes the subscription
+    const { setCurrentUser, collectionsArray } = this.props;
+
+    /** onAuthStateChanged is a open subscription (open message system) between the app and firebase
+     * that is, whenever any changes occur on firebase, firebase sends out a message that user has updated
+     * This will automatically check for user login status
+     * since this is an open subscription, we also want to close the subscription since we don't want any memory leaks from JavaScript
+     * onAuthStateChanged returns a function inside the unsubscribeFromAuth property,
+     * which when called when component unmounts would closes the subscription */
+
     this.unsubscribeFromAuth = auth.onAuthStateChanged(async userAuth => {
       if (userAuth) {
-        try {
-          const userRef = await createUserProfileDocument(userAuth);
+        const userRef = await createUserProfileDocument(userAuth);
 
-          if (!userRef) throw Error('Error getting user documentRef');
-
-          // Get the data from document ref object using snapshot.data() method
-          userRef.onSnapshot(snapshot => {
-            this.props.setCurrentUser({
-              id: snapshot.id,
-              ...snapshot.data()
-            });
+        userRef.onSnapshot(snapShot => {
+          setCurrentUser({
+            id: snapShot.id,
+            ...snapShot.data()
           });
-        } catch (error) {
-          console.log('Error getting user login details', error.message);
-          this.resetUserState();
-        }
-      } else {
-        this.resetUserState();
+        });
       }
+
+      setCurrentUser(userAuth);
+      // Only add the title and items from the collections array (shop.data.js),
+      // and not the the id and routename
+      addCollectionAndDocuments(
+        'collections',
+        collectionsArray.map(({ title, items }) => ({ title, items }))
+      );
     });
   }
 
@@ -82,7 +86,8 @@ class App extends React.Component {
 }
 
 const mapStateToProps = createStructuredSelector({
-  currentUser: currentUserSelector
+  currentUser: currentUserSelector,
+  collectionsArray: collectionsForPreviewSelector
 });
 
 const mapDispatchToProps = dispatch => ({

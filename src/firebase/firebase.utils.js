@@ -17,6 +17,8 @@ const config = {
   measurementId: 'G-FPQX54RF02'
 };
 
+firebase.initializeApp(config);
+
 export const createUserProfileDocument = async (userAuth, additionalData) => {
   if (!userAuth) return;
 
@@ -42,7 +44,26 @@ export const createUserProfileDocument = async (userAuth, additionalData) => {
   return userRef;
 };
 
-firebase.initializeApp(config);
+/** 07182020 - Upload data on Firebase */
+
+export const addCollectionAndDocuments = async (
+  collectionKey,
+  objectsToAdd
+) => {
+  const collectionRef = firestore.collection(collectionKey);
+
+  // Send additions as batch to either 'add all' or 'add none',
+  // i.e for the firestore transaction to either 'commit on success' or 'rollback on failure'
+  const batch = firestore.batch();
+  objectsToAdd.forEach(obj => {
+    // Create a new doc reference to add records using set() method
+    const newDocRef = collectionRef.doc();
+    // instead of doc.set() for a single record, use batch.set() for multiple
+    batch.set(newDocRef, obj);
+  });
+
+  return await batch.commit();
+};
 
 export const auth = firebase.auth();
 export const firestore = firebase.firestore();

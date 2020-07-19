@@ -32,14 +32,35 @@ class ShopPage extends React.Component {
     const { updateCollections } = this.props;
     const collectionRef = firestore.collection('collections');
 
-    /** Whenever the collectionRef updates OR when the code is run for the first time,
-     * this collectionRef would send us the SnapShot representing the code of our collection's snapshot array
-     * at the time when this code renders */
-    collectionRef.onSnapshot(async snapshot => {
-      const collectionsMap = await convertCollectionsSnapshotToMap(snapshot);
-      await updateCollections(collectionsMap);
+    // GET DATA PATTERN 3 - Using native Fetch API for API calls provided by firestore
+    /** 07192020 - Another approach is to use the native Fetch API to use the APIs provided
+     * by firestore
+     * However, we aren't using it in this case becaues the data returned is very much nested into multiple
+     * levels. See the console for the log in the example below */
+    // fetch('https://firestore.googleapis.com/v1/projects/garyd-crwn-db/databases/(default)/document/collections')
+    // .then(response => response.json())
+    // .then(collections => console.log(collections))
+
+    //  GET DATA PATTERN 2 - Using Promise based methods provided by firestore
+    /** 07192020 - Replace the live-stream of updates, provided by firestore using the
+     * observable/observer pattern, used promise pattern to one-time get records on each
+     * componentDidMount() call */
+    collectionRef.get().then(snapshot => {
+      const collectionsMap = convertCollectionsSnapshotToMap(snapshot);
+      updateCollections(collectionsMap);
       this.setState({ loading: false });
     });
+
+    // GET DATA PATTERN 1 - observable/observer, live-data stream, open-connection listening to update
+    // events, provided by firestore
+    // /** Whenever the collectionRef updates OR when the code is run for the first time,
+    //  * this collectionRef would send us the SnapShot representing the code of our collection's snapshot array
+    //  * at the time when this code renders */
+    // collectionRef.onSnapshot(async snapshot => {
+    //   const collectionsMap = await convertCollectionsSnapshotToMap(snapshot);
+    //   await updateCollections(collectionsMap);
+    //   this.setState({ loading: false });
+    // });
   }
 
   render() {

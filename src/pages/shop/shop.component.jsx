@@ -9,10 +9,23 @@ import {
 
 import { updateCollections } from '../../redux/shop/shop.actions';
 
+import WithSpinnerHOC from '../../components/with-spinner-HOC/with-spinner.component';
+
 import CollectionOverview from '../../components/collections-overview/collections-overview.component';
 import CollectionPage from '../collection/collection.component';
 
+/** 07192020 - Instead of passing the 'component' inside Route, render the modified components
+ * passing the loading state
+ * Explicitly pass the (match, location and history) props to the modified component in the 'render' property,
+ * since Route passed them implicitly to the 'component' property */
+const CollectionsOverviewWithSpinner = WithSpinnerHOC(CollectionOverview);
+const CollectionsPageWithSpinner = WithSpinnerHOC(CollectionPage);
+
 class ShopPage extends React.Component {
+  state = {
+    loading: true
+  };
+
   unsubscribeFromSnapshot = null;
 
   componentDidMount() {
@@ -25,17 +38,27 @@ class ShopPage extends React.Component {
     collectionRef.onSnapshot(async snapshot => {
       const collectionsMap = await convertCollectionsSnapshotToMap(snapshot);
       await updateCollections(collectionsMap);
+      this.setState({ loading: false });
     });
   }
 
   render() {
     const { match } = this.props;
+    const { loading } = this.state;
     return (
       <div className='shop-page'>
-        <Route exact path={`${match.path}`} component={CollectionOverview} />
+        <Route
+          exact
+          path={`${match.path}`}
+          render={props => (
+            <CollectionsOverviewWithSpinner isLoading={loading} {...props} />
+          )}
+        />
         <Route
           path={`${match.path}/:collectionId`}
-          component={CollectionPage}
+          render={props => (
+            <CollectionsPageWithSpinner isLoading={loading} {...props} />
+          )}
         />
       </div>
     );

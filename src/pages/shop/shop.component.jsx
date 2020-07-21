@@ -1,4 +1,5 @@
-import React from 'react';
+// 07212020 - Converted class component to a functional one to use Hooks
+import React, { useEffect } from 'react';
 import { Route } from 'react-router-dom';
 import { connect } from 'react-redux';
 
@@ -14,41 +15,37 @@ import CollectionsPageContainer from '../collection/collection.container';
 // const CollectionsOverviewWithSpinner = WithSpinnerHOC(CollectionOverview);
 // const CollectionsPageWithSpinner = WithSpinnerHOC(CollectionPage);
 
-class ShopPage extends React.Component {
-  componentDidMount() {
-    const { fetchCollectionsStartAsync } = this.props;
+const ShopPage = ({ fetchCollectionsStartAsync, match }) => {
+  useEffect(() => {
     fetchCollectionsStartAsync();
-  }
+  }, [fetchCollectionsStartAsync]);
 
-  render() {
-    const { match } = this.props;
-    return (
-      <div className='shop-page'>
-        <Route
-          exact
-          path={`${match.path}`}
-          // render={(props) => (
-          //   <CollectionsOverviewWithSpinner
-          //     isLoading={isCollectionFetching}
-          //     {...props}
-          //   />
-          // )}
-          component={CollectionsOverviewContainer}
-        />
-        <Route
-          path={`${match.path}/:collectionId`}
-          component={CollectionsPageContainer}
-          // render={(props) => (
-          //   <CollectionsPageWithSpinner
-          //     isLoading={!isCollectionsLoaded}
-          //     {...props}
-          //   />
-          // )}
-        />
-      </div>
-    );
-  }
-}
+  return (
+    <div className='shop-page'>
+      <Route
+        exact
+        path={`${match.path}`}
+        // render={(props) => (
+        //   <CollectionsOverviewWithSpinner
+        //     isLoading={isCollectionFetching}
+        //     {...props}
+        //   />
+        // )}
+        component={CollectionsOverviewContainer}
+      />
+      <Route
+        path={`${match.path}/:collectionId`}
+        component={CollectionsPageContainer}
+        // render={(props) => (
+        //   <CollectionsPageWithSpinner
+        //     isLoading={!isCollectionsLoaded}
+        //     {...props}
+        //   />
+        // )}
+      />
+    </div>
+  );
+};
 
 // const mapStateToProps = createStructuredSelector({
 //   isCollectionsLoaded: isCollectionsLoadedSelector,

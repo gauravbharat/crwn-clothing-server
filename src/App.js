@@ -1,4 +1,6 @@
-import React from 'react';
+// 07212020 - Converted class component to a functional one to use Hooks,
+// also added code to unsubscribe from firestore listener
+import React, { useEffect } from 'react';
 import { Route, Switch, Redirect } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
@@ -16,12 +18,8 @@ import { currentUserSelector } from './redux/user/user.selectors';
 
 import { auth, createUserProfileDocument } from './firebase/firebase.utils';
 
-class App extends React.Component {
-  unsubscribeFromAuth = null;
-
-  componentDidMount() {
-    const { setCurrentUser } = this.props;
-
+const App = ({ currentUser, setCurrentUser }) => {
+  useEffect(() => {
     /** onAuthStateChanged is a open subscription (open message system) between the app and firebase
      * that is, whenever any changes occur on firebase, firebase sends out a message that user has updated
      * This will automatically check for user login status
@@ -29,7 +27,8 @@ class App extends React.Component {
      * onAuthStateChanged returns a function inside the unsubscribeFromAuth property,
      * which when called when component unmounts would closes the subscription */
 
-    this.unsubscribeFromAuth = auth.onAuthStateChanged(async (userAuth) => {
+    //  listen for auth state changes
+    const unsubscribeFromAuth = auth.onAuthStateChanged(async (userAuth) => {
       if (userAuth) {
         const userRef = await createUserProfileDocument(userAuth);
 
@@ -43,36 +42,34 @@ class App extends React.Component {
 
       setCurrentUser(userAuth);
     });
-  }
 
-  componentWillUnmount() {
-    // unsubscribe from auth when component unmounts
-    this.unsubscribeFromAuth();
-  }
+    // unsubscribe to the listener when unmounting
+    return () => unsubscribeFromAuth();
 
-  render() {
-    return (
-      <div>
-        <Header />
-        <Switch>
-          <Route exact path='/' component={HomePage} />
-          {/* Shop page would have sub-routes under it e.g. shop/jackets, etc., hence exact keyword not used for path */}
-          <Route path='/shop' component={ShopPage} />
-          <Route exact path='/checkout' component={CheckoutPage} />
-          {/* Use conditional render, if user is signed-in Redirect to Homepage OR to sign-in page if user is logged-out */}
-          <Route
-            exact
-            path='/signin'
-            render={() =>
-              this.props.currentUser ? <Redirect to='/' /> : <Authentication />
-            }
-          />
-          <Route path='*' component={NoMatch} />
-        </Switch>
-      </div>
-    );
-  }
-}
+    // eslint-disable-next-line
+  }, []);
+
+  return (
+    <div>
+      <Header />
+      <Switch>
+        <Route exact path='/' component={HomePage} />
+        {/* Shop page would have sub-routes under it e.g. shop/jackets, etc., hence exact keyword not used for path */}
+        <Route path='/shop' component={ShopPage} />
+        <Route exact path='/checkout' component={CheckoutPage} />
+        {/* Use conditional render, if user is signed-in Redirect to Homepage OR to sign-in page if user is logged-out */}
+        <Route
+          exact
+          path='/signin'
+          render={() =>
+            currentUser ? <Redirect to='/' /> : <Authentication />
+          }
+        />
+        <Route path='*' component={NoMatch} />
+      </Switch>
+    </div>
+  );
+};
 
 const mapStateToProps = createStructuredSelector({
   currentUser: currentUserSelector,
